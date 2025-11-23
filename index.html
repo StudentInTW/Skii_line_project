@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>處理中...</title>
+    <script
+      charset="utf-8"
+      src="https://static.line-scdn.net/liff/edge/2/sdk.js"
+    ></script>
+    <style>
+      /* 讓畫面看起來像在讀取，優化體驗 */
+      body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        margin: 0;
+        background-color: #f0f0f0;
+        font-family: sans-serif;
+        color: #666;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="status">正在為您跳轉...</div>
+
+    <script>
+      // ▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼▼
+      // 稍後要把申請到的 ID 填入下方引號中
+      const YOUR_LIFF_ID = "這裡先留空，等下填";
+      // ▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲▲
+
+      async function main() {
+        try {
+          // 1. 初始化 LIFF
+          await liff.init({ liffId: YOUR_LIFF_ID });
+
+          // 2. 檢查是否在 LINE App 內開啟
+          if (!liff.isInClient()) {
+            document.getElementById("status").innerText =
+              "請在 LINE App 內使用此功能";
+            return;
+          }
+
+          // 3. 抓取網址參數中的 text (例如 ?text=課程建議)
+          const urlParams = new URLSearchParams(window.location.search);
+          const messageText = urlParams.get("text");
+
+          if (!messageText) {
+            document.getElementById("status").innerText = "發生錯誤：缺少參數";
+            return;
+          }
+
+          // 4. 幫使用者發送訊息
+          await liff.sendMessages([
+            {
+              type: "text",
+              text: messageText,
+            },
+          ]);
+
+          // 5. 發送成功後，立刻關閉視窗
+          liff.closeWindow();
+        } catch (err) {
+          console.error(err);
+          document.getElementById("status").innerText =
+            "發生錯誤：" + err.message;
+        }
+      }
+
+      main();
+    </script>
+  </body>
+</html>
